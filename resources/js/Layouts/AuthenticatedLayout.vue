@@ -25,6 +25,11 @@ const menuItems = ref([
                 icon: "pi pi-tags",
                 route: "categories.index",
             },
+            {
+                label: "Suppliers",
+                icon: "pi pi-inbox",
+                route: "suppliers.index",
+            },
         ],
     },
 ]);

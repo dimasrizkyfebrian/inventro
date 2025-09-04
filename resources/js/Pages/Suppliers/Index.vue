@@ -2,29 +2,24 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, usePage, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import SupplierFormModal from "@/Components/SupplierFormModal.vue";
 
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import { useToast } from "primevue/usetoast";
-import CategoryFormModal from "@/Components/CategoryFormModal.vue";
-import { useConfirm } from "primevue/useconfirm";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
 import { FilterMatchMode } from "@primevue/core/api";
 
-const props = defineProps({
-    categories: {
-        type: Array,
-    },
-});
-
+const props = defineProps({ suppliers: Array });
 const page = usePage();
+const confirm = useConfirm();
 const toast = useToast();
 const isModalVisible = ref(false);
-const editingCategory = ref(null);
-const confirm = useConfirm();
+const editingSupplier = ref(null);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -40,42 +35,32 @@ watch(
                 life: 3000,
             });
         }
-        if (flash && flash.error) {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: flash.error,
-                life: 3000,
-            });
-        }
     },
     { deep: true }
 );
 
 const openAddModal = () => {
-    editingCategory.value = null;
+    editingSupplier.value = null;
     isModalVisible.value = true;
 };
-
-const openEditModal = (category) => {
-    editingCategory.value = category;
+const openEditModal = (supplier) => {
+    editingSupplier.value = supplier;
     isModalVisible.value = true;
 };
-
 const closeModal = () => {
     isModalVisible.value = false;
-    editingCategory.value = null;
+    editingSupplier.value = null;
 };
 
-const deleteCategory = (category) => {
+const deleteSupplier = (supplier) => {
     confirm.require({
-        message: "Are you sure you want to delete this category?",
+        message: "Are you sure you want to delete this supplier?",
         header: "Delete Confirmation",
         icon: "pi pi-info-circle",
         rejectClass: "p-button-secondary p-button-outlined",
         acceptClass: "p-button-danger",
         accept: () => {
-            router.delete(route("categories.destroy", category.id), {
+            router.delete(route("suppliers.destroy", supplier.id), {
                 preserveScroll: true,
             });
         },
@@ -84,12 +69,12 @@ const deleteCategory = (category) => {
 </script>
 
 <template>
-    <Head title="Categories" />
+    <Head title="Suppliers" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Manage Categories
+                Manage Suppliers
             </h2>
         </template>
 
@@ -97,7 +82,7 @@ const deleteCategory = (category) => {
             <div class="p-6">
                 <DataTable
                     v-model:filters="filters"
-                    :value="categories"
+                    :value="suppliers"
                     paginator
                     :rows="10"
                     stripedRows
@@ -105,7 +90,7 @@ const deleteCategory = (category) => {
                     dataKey="id"
                     filterDisplay="row"
                     :loading="loading"
-                    :globalFilterFields="['name']"
+                    :globalFilterFields="['name', 'email']"
                 >
                     <template #header>
                         <div class="flex justify-end">
@@ -119,7 +104,7 @@ const deleteCategory = (category) => {
                                 />
                             </IconField>
                             <Button
-                                label="Add Category"
+                                label="Add Supplier"
                                 icon="pi pi-plus"
                                 @click="openAddModal"
                             />
@@ -131,7 +116,8 @@ const deleteCategory = (category) => {
                     </template>
                     <Column field="id" header="ID" sortable></Column>
                     <Column field="name" header="Name" sortable></Column>
-                    <Column field="slug" header="Slug"></Column>
+                    <Column field="email" header="Email"></Column>
+                    <Column field="phone" header="Phone"></Column>
                     <Column header="Actions">
                         <template #body="slotProps">
                             <div class="flex space-x-2">
@@ -142,7 +128,7 @@ const deleteCategory = (category) => {
                                     v-tooltip.top="'Edit'"
                                 />
                                 <Button
-                                    @click="deleteCategory(slotProps.data)"
+                                    @click="deleteSupplier(slotProps.data)"
                                     icon="pi pi-trash"
                                     class="p-button-rounded p-button-danger"
                                     v-tooltip.top="'Delete'"
@@ -153,9 +139,10 @@ const deleteCategory = (category) => {
                 </DataTable>
             </div>
         </div>
-        <CategoryFormModal
+
+        <SupplierFormModal
             :visible="isModalVisible"
-            :category="editingCategory"
+            :supplier="editingSupplier"
             @close="closeModal"
         />
     </AuthenticatedLayout>
