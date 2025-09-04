@@ -30,6 +30,11 @@ const menuItems = ref([
                 icon: "pi pi-inbox",
                 route: "suppliers.index",
             },
+            {
+                label: "Products",
+                icon: "pi pi-box",
+                route: "products.index",
+            },
         ],
     },
 ]);
