@@ -5,7 +5,7 @@ import { ref, onMounted } from "vue";
 
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
-import Calendar from "primevue/calendar";
+import DatePicker from "primevue/datepicker";
 import InputNumber from "primevue/inputnumber";
 import AutoComplete from "primevue/autocomplete";
 
@@ -14,6 +14,8 @@ const props = defineProps({
     suppliers: Array,
     products: Array,
 });
+
+const icondisplay = ref();
 
 const form = useForm({
     _method: "PUT",
@@ -112,9 +114,11 @@ const submit = () => {
                     </div>
                     <div>
                         <label for="order_date">Order Date</label>
-                        <Calendar
-                            v-model="form.order_date"
-                            class="w-full mt-1"
+                        <DatePicker
+                            v-model="icondisplay"
+                            showIcon
+                            fluid
+                            iconDisplay="input"
                         />
                     </div>
                 </div>

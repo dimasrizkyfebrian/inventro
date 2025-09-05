@@ -4,20 +4,17 @@ import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 import Button from "primevue/button";
-import Dropdown from "primevue/dropdown";
 import DatePicker from "primevue/datepicker";
 import InputNumber from "primevue/inputnumber";
 import AutoComplete from "primevue/autocomplete";
 
 const props = defineProps({
-    suppliers: Array,
     products: Array,
 });
 
 const icondisplay = ref();
 
 const form = useForm({
-    supplier_id: null,
     order_date: new Date(),
     notes: "",
     items: [],
@@ -30,7 +27,8 @@ const addProductItem = () => {
         product_id: null,
         product_name: "",
         quantity: 1,
-        cost: 0,
+        price: 0,
+        available_stock: 0,
     });
 };
 
@@ -41,7 +39,8 @@ const removeProductItem = (index) => {
 const onProductSelect = (event, item) => {
     const selectedProduct = event.value;
     item.product_id = selectedProduct.id;
-    item.cost = selectedProduct.cost ?? 0;
+    item.price = selectedProduct.price ?? 0;
+    item.available_stock = selectedProduct.quantity;
     item.product_name = selectedProduct.name;
 };
 
@@ -51,45 +50,35 @@ const searchProduct = (event) => {
     } else {
         filteredProducts.value = props.products.filter((product) => {
             const query = event.query.toLowerCase();
-            const nameMatch = product.name.toLowerCase().includes(query);
-            const skuMatch = product.sku.toLowerCase().includes(query);
-            return nameMatch || skuMatch;
+            return (
+                product.name.toLowerCase().includes(query) ||
+                product.sku.toLowerCase().includes(query)
+            );
         });
     }
 };
 
 const submit = () => {
-    if (!form.supplier_id) {
-        alert("Please select a supplier.");
-        return;
-    }
-    if (!form.items || form.items.length === 0) {
-        alert("Please add at least one product.");
-        return;
-    }
-
     form.transform((data) => ({
         ...data,
         items: data.items.map((item) => ({
             product_id: item.product_id,
             quantity: item.quantity,
-            cost: item.cost,
+            price: item.price,
         })),
-    })).post(route("purchase-orders.store"), {
-        onSuccess: () => {},
-    });
+    })).post(route("sales-orders.store"));
 };
 </script>
 
 <template>
-    <Head title="Create Purchase Order" />
+    <Head title="Create Sales Order" />
     <AuthenticatedLayout>
         <template #header>
             <div class="flex justify-between items-center">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Create Purchase Order
+                    Create Sales Order
                 </h2>
-                <Link :href="route('purchase-orders.index')">
+                <Link :href="route('sales-orders.index')">
                     <Button
                         label="Back to List"
                         icon="pi pi-arrow-left"
@@ -103,17 +92,6 @@ const submit = () => {
         <div class="p-6 bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <form @submit.prevent="submit">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div>
-                        <label for="supplier">Supplier</label>
-                        <Dropdown
-                            v-model="form.supplier_id"
-                            :options="suppliers"
-                            optionLabel="name"
-                            optionValue="id"
-                            placeholder="Select a Supplier"
-                            class="w-full mt-1"
-                        />
-                    </div>
                     <div>
                         <label for="order_date">Order Date</label>
                         <DatePicker
@@ -135,7 +113,7 @@ const submit = () => {
                                     <th class="p-3 text-left w-1/5">
                                         Quantity
                                     </th>
-                                    <th class="p-3 text-left w-1/5">Cost</th>
+                                    <th class="p-3 text-left w-1/5">Price</th>
                                     <th class="p-3 text-left w-1/5">
                                         Subtotal
                                     </th>
@@ -163,7 +141,11 @@ const submit = () => {
                                             <template #option="slotProps">
                                                 <div>
                                                     {{ slotProps.option.name }}
-                                                    ({{ slotProps.option.sku }})
+                                                    (Stock:
+                                                    {{
+                                                        slotProps.option
+                                                            .quantity
+                                                    }})
                                                 </div>
                                             </template>
                                         </AutoComplete>
@@ -172,11 +154,12 @@ const submit = () => {
                                         <InputNumber
                                             v-model="item.quantity"
                                             :min="1"
+                                            :max="item.available_stock"
                                         />
                                     </td>
                                     <td class="p-2">
                                         <InputNumber
-                                            v-model="item.cost"
+                                            v-model="item.price"
                                             mode="currency"
                                             currency="USD"
                                             locale="en-US"
@@ -186,7 +169,7 @@ const submit = () => {
                                         {{
                                             (
                                                 (item.quantity || 0) *
-                                                (item.cost || 0)
+                                                (item.price || 0)
                                             ).toLocaleString("en-US", {
                                                 style: "currency",
                                                 currency: "USD",
@@ -228,7 +211,7 @@ const submit = () => {
                 <div class="mt-6 flex justify-end">
                     <Button
                         type="submit"
-                        label="Save Purchase Order"
+                        label="Save Sales Order"
                         :loading="form.processing"
                     />
                 </div>

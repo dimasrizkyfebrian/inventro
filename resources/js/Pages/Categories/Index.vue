@@ -115,7 +115,7 @@ const deleteCategory = (category) => {
                                 </InputIcon>
                                 <InputText
                                     v-model="filters['global'].value"
-                                    placeholder="Keyword Search"
+                                    placeholder="Search Category..."
                                 />
                             </IconField>
                             <Button

@@ -110,7 +110,7 @@ const deleteProduct = (product) => {
                                 </InputIcon>
                                 <InputText
                                     v-model="filters['global'].value"
-                                    placeholder="Search products..."
+                                    placeholder="Search Product..."
                                 />
                             </IconField>
                             <Button

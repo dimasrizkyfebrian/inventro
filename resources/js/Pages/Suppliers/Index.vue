@@ -100,7 +100,7 @@ const deleteSupplier = (supplier) => {
                                 </InputIcon>
                                 <InputText
                                     v-model="filters['global'].value"
-                                    placeholder="Keyword Search"
+                                    placeholder="Search Supplier..."
                                 />
                             </IconField>
                             <Button

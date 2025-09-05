@@ -7,7 +7,6 @@ import Button from "primevue/button";
 import Toast from "primevue/toast";
 import ConfirmDialog from "primevue/confirmdialog";
 
-// State untuk kontrol sidebar mobile
 const isSidebarVisible = ref(false);
 
 const menu = ref();
@@ -45,11 +44,15 @@ const menuItems = ref([
                 icon: "pi pi-shopping-cart",
                 route: "purchase-orders.index",
             },
+            {
+                label: "Sales Orders",
+                icon: "pi pi-arrow-right-arrow-left",
+                route: "sales-orders.index",
+            },
         ],
     },
 ]);
 
-// Untuk dropdown user
 const userMenu = ref();
 const userMenuItems = ref([
     { label: "Profile", icon: "pi pi-user", route: "profile.edit" },
