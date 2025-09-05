@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, usePage, router } from "@inertiajs/vue3";
-import { ref, watch, computed } from "vue";
+import { ref, watch } from "vue";
 import ProductFormModal from "@/Components/ProductFormModal.vue";
 
 import DataTable from "primevue/datatable";
@@ -132,7 +132,11 @@ const deleteProduct = (product) => {
                         header="Category"
                         sortable
                     ></Column>
-                    <Column field="quantity" header="Qty" sortable></Column>
+                    <Column
+                        field="quantity"
+                        header="Quantity"
+                        sortable
+                    ></Column>
                     <Column field="price" header="Price" sortable>
                         <template #body="slotProps">
                             {{ formatCurrency(slotProps.data.price) }}

@@ -13,7 +13,7 @@ const isSidebarVisible = ref(false);
 const menu = ref();
 const menuItems = ref([
     {
-        label: "Navigation",
+        label: "Data Master",
         items: [
             {
                 label: "Dashboard",
@@ -34,6 +34,16 @@ const menuItems = ref([
                 label: "Products",
                 icon: "pi pi-box",
                 route: "products.index",
+            },
+        ],
+    },
+    {
+        label: "Transactions",
+        items: [
+            {
+                label: "Purchase Orders",
+                icon: "pi pi-shopping-cart",
+                route: "purchase-orders.index",
             },
         ],
     },
