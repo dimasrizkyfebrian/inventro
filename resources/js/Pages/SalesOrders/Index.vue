@@ -13,6 +13,7 @@ import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
 import Tag from "primevue/tag";
+import DatePicker from "primevue/datepicker";
 
 defineProps({ salesOrders: Array });
 
@@ -21,6 +22,10 @@ const toast = useToast();
 const confirm = useConfirm();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+const reportDates = ref({
+    start_date: null,
+    end_date: null,
 });
 
 const getStatusSeverity = (status) => {
@@ -72,6 +77,25 @@ const deleteSalesOrder = (salesOrder) => {
         },
     });
 };
+
+const generateReport = () => {
+    if (!reportDates.value.start_date || !reportDates.value.end_date) {
+        alert("Please select both start and end dates.");
+        return;
+    }
+
+    const startDate = new Date(reportDates.value.start_date)
+        .toISOString()
+        .slice(0, 10);
+    const endDate = new Date(reportDates.value.end_date)
+        .toISOString()
+        .slice(0, 10);
+
+    window.open(
+        route("reports.sales", { start_date: startDate, end_date: endDate }),
+        "_blank"
+    );
+};
 </script>
 
 <template>
@@ -85,6 +109,28 @@ const deleteSalesOrder = (salesOrder) => {
 
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4"
+                >
+                    <div class="flex items-center gap-2 border p-2 rounded-md">
+                        <DatePicker
+                            v-model="reportDates.start_date"
+                            placeholder="Start Date"
+                            dateFormat="yy-mm-dd"
+                        />
+                        <span>to</span>
+                        <DatePicker
+                            v-model="reportDates.end_date"
+                            placeholder="End Date"
+                            dateFormat="yy-mm-dd"
+                        />
+                        <Button
+                            label="Generate Report"
+                            icon="pi pi-print"
+                            @click="generateReport"
+                        />
+                    </div>
+                </div>
                 <DataTable
                     v-model:filters="filters"
                     :value="salesOrders"

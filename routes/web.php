@@ -7,6 +7,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::resource('sales-orders', SalesOrderController::class);
+    Route::get('/reports/sales', [ReportController::class, 'salesReport'])->name('reports.sales');
 });
 
 require __DIR__ . '/auth.php';
