@@ -93,6 +93,7 @@ const formatCurrency = (value) => {
                             type="line"
                             :data="salesChartData"
                             :options="chartOptions"
+                            class="h-[20rem]"
                         />
                     </div>
 

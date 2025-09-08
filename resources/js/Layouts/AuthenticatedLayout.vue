@@ -9,16 +9,20 @@ import ConfirmDialog from "primevue/confirmdialog";
 
 const isSidebarVisible = ref(false);
 
-const menu = ref();
 const menuItems = ref([
     {
-        label: "Data Master",
+        label: "Analytics",
         items: [
             {
                 label: "Dashboard",
                 icon: "pi pi-home",
                 route: "dashboard",
             },
+        ],
+    },
+    {
+        label: "Data Master",
+        items: [
             {
                 label: "Categories",
                 icon: "pi pi-tags",
@@ -48,6 +52,11 @@ const menuItems = ref([
                 label: "Sales Orders",
                 icon: "pi pi-arrow-right-arrow-left",
                 route: "sales-orders.index",
+            },
+            {
+                label: "Stock Adjustments",
+                icon: "pi pi-sliders-h",
+                route: "stock-adjustments.index",
             },
         ],
     },
