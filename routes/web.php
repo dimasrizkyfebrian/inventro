@@ -9,6 +9,7 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,10 +33,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('products', ProductController::class);
+    Route::get('/products/{product}/qrcode', [ProductController::class, 'generateQrCode'])->name('products.qrcode');
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::resource('sales-orders', SalesOrderController::class);
     Route::resource('stock-adjustments', StockAdjustmentController::class)->only(['index', 'store']);
     Route::get('/reports/sales', [ReportController::class, 'salesReport'])->name('reports.sales');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 });
 
 require __DIR__ . '/auth.php';

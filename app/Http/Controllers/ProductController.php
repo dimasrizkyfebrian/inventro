@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Label\Font\NotoSans;
 
 class ProductController extends Controller
 {
@@ -52,9 +59,12 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Product $product)
     {
-        //
+        $product->load('category');
+        return Inertia::render('Products/Show', [
+            'product' => $product,
+        ]);
     }
 
     /**
@@ -91,5 +101,26 @@ class ProductController extends Controller
     {
         $product->delete();
         return Redirect::route('products.index')->with('success', 'Product deleted successfully.');
+    }
+
+    public function generateQrCode(Product $product)
+    {
+        $writer = new PngWriter();
+
+        $qrCode = new QrCode(
+            data: $product->sku,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: 300,
+            margin: 10,
+            foregroundColor: new Color(0, 0, 0),
+            backgroundColor: new Color(255, 255, 255)
+        );
+
+        $result = $writer->write($qrCode, null, null);
+
+        return response($result->getString(), 200, [
+            'Content-Type' => $result->getMimeType(),
+        ]);
     }
 }

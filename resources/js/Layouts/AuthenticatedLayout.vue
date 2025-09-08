@@ -1,13 +1,17 @@
 <script setup>
 import { ref } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage, router } from "@inertiajs/vue3";
 import Menu from "primevue/menu";
 import Avatar from "primevue/avatar";
 import Button from "primevue/button";
 import Toast from "primevue/toast";
 import ConfirmDialog from "primevue/confirmdialog";
+import Popover from "primevue/popover";
+import OverlayBadge from "primevue/overlaybadge";
 
 const isSidebarVisible = ref(false);
+const op = ref();
+const page = usePage();
 
 const menuItems = ref([
     {
@@ -76,6 +80,19 @@ const userMenuItems = ref([
 const toggleUserMenu = (event) => {
     userMenu.value.toggle(event);
 };
+
+const toggleNotifications = (event) => {
+    op.value.toggle(event);
+    if (page.props.auth.notifications.length > 0) {
+        router.post(
+            route("notifications.markAsRead"),
+            {},
+            {
+                preserveScroll: true,
+            }
+        );
+    }
+};
 </script>
 
 <template>
@@ -111,39 +128,68 @@ const toggleUserMenu = (event) => {
                 </Menu>
             </div>
 
-            <div class="p-4 border-t">
-                <button
-                    @click="toggleUserMenu"
-                    class="w-full flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100"
-                >
-                    <Avatar
-                        :label="
-                            $page.props.auth.user.name.charAt(0).toUpperCase()
-                        "
-                        shape="circle"
+            <div class="flex items-center border-t">
+                <div class="p-4">
+                    <button
+                        @click="toggleUserMenu"
+                        class="w-full flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100"
+                    >
+                        <Avatar
+                            :label="
+                                $page.props.auth.user.name
+                                    .charAt(0)
+                                    .toUpperCase()
+                            "
+                            shape="circle"
+                        />
+                        <span class="font-semibold text-gray-700">{{
+                            $page.props.auth.user.name
+                        }}</span>
+                    </button>
+                    <Menu
+                        ref="userMenu"
+                        :model="userMenuItems"
+                        :popup="true"
+                        class="w-56"
+                    >
+                        <template #item="{ item }">
+                            <Link
+                                :href="route(item.route)"
+                                :method="item.method || 'get'"
+                                as="button"
+                                class="w-full text-left flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
+                            >
+                                <span :class="item.icon" class="mr-2"></span>
+                                <span>{{ item.label }}</span>
+                            </Link>
+                        </template>
+                    </Menu>
+                </div>
+
+                <template v-if="page.props.auth.notifications.length > 0">
+                    <OverlayBadge
+                        :value="page.props.auth.notifications.length"
+                        severity="danger"
+                    >
+                        <Button
+                            type="button"
+                            icon="pi pi-bell"
+                            @click="toggleNotifications"
+                            text
+                            rounded
+                        />
+                    </OverlayBadge>
+                </template>
+
+                <template v-else>
+                    <Button
+                        type="button"
+                        icon="pi pi-bell"
+                        @click="toggleNotifications"
+                        text
+                        rounded
                     />
-                    <span class="font-semibold text-gray-700">{{
-                        $page.props.auth.user.name
-                    }}</span>
-                </button>
-                <Menu
-                    ref="userMenu"
-                    :model="userMenuItems"
-                    :popup="true"
-                    class="w-56"
-                >
-                    <template #item="{ item }">
-                        <Link
-                            :href="route(item.route)"
-                            :method="item.method || 'get'"
-                            as="button"
-                            class="w-full text-left flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200"
-                        >
-                            <span :class="item.icon" class="mr-2"></span>
-                            <span>{{ item.label }}</span>
-                        </Link>
-                    </template>
-                </Menu>
+                </template>
             </div>
         </aside>
 
@@ -166,6 +212,30 @@ const toggleUserMenu = (event) => {
                 <slot />
             </main>
         </div>
+
+        <Popover ref="op" class="mt-2">
+            <div class="w-80">
+                <div class="p-3 font-bold border-b">Notifications</div>
+                <div
+                    v-if="page.props.auth.notifications.length > 0"
+                    class="max-h-80 overflow-y-auto"
+                >
+                    <div
+                        v-for="notification in page.props.auth.notifications"
+                        :key="notification.id"
+                        class="p-3 border-b hover:bg-gray-100 cursor-pointer"
+                    >
+                        <p class="text-sm">{{ notification.data.message }}</p>
+                        <small class="text-gray-500">{{
+                            new Date(notification.created_at).toLocaleString()
+                        }}</small>
+                    </div>
+                </div>
+                <div v-else class="p-4 text-center text-gray-500">
+                    No new notifications.
+                </div>
+            </div>
+        </Popover>
 
         <div
             v-if="isSidebarVisible"

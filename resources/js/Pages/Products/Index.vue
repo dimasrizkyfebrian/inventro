@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, usePage, router } from "@inertiajs/vue3";
+import { Head, usePage, router, Link } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import ProductFormModal from "@/Components/ProductFormModal.vue";
 
@@ -126,7 +126,18 @@ const deleteProduct = (product) => {
                     </template>
                     <Column field="id" header="ID" sortable></Column>
                     <Column field="sku" header="SKU" sortable></Column>
-                    <Column field="name" header="Name" sortable></Column>
+                    <Column field="name" header="Name" sortable>
+                        <template #body="slotProps">
+                            <Link
+                                :href="
+                                    route('products.show', slotProps.data.id)
+                                "
+                                class="text-blue-600 hover:underline font-semibold"
+                            >
+                                {{ slotProps.data.name }}
+                            </Link>
+                        </template>
+                    </Column>
                     <Column
                         field="category.name"
                         header="Category"
